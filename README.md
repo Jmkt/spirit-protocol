@@ -6,6 +6,8 @@
 [![Format](https://img.shields.io/badge/format-markdown-58a6ff.svg)](SCHEMA.md)
 [![Open Protocol](https://img.shields.io/badge/protocol-open-58a6ff.svg)](#)
 
+![Spirit.MD — invoke persistent minds. One file, any AI, persistent memory.](assets/spirit-md-banner.png)
+
 > Every AI forgets. Your Spirits don't.  
 > **Collect. Invoke. Evolve.**
 
@@ -109,6 +111,25 @@ Spirit.MD is the only approach that gives you:
 
 ---
 
+## Architecture
+
+```mermaid
+graph LR
+    A["spirit.md<br/>(frontmatter + body)"] --> B{Any LLM runtime}
+    B --> C[Claude]
+    B --> D[Gemini]
+    B --> E[Local model]
+    C --> F["## LOG<br/>(session notes)"]
+    D --> F
+    E --> F
+    F -.append after session.-> A
+```
+
+One file is the single source of truth. Any LLM runtime reads it the same
+way — there's no adapter, no API, no translation layer. After a session,
+the assistant appends to the file's own `## LOG`, and that update travels
+with the file into the next session, on the same model or a different one.
+
 ---
 
 ## Key features
@@ -136,8 +157,7 @@ spirit-protocol/
 ├── tests/
 │   ├── fixtures/            # code used in the comparison test
 │   └── results/              # raw, unedited test transcripts
-├── docs/
-│   └── IMAGE_PROMPTS.md    # prompts for this repo's own visuals
+├── assets/                  # repo visuals (banner, diagrams)
 └── LICENSE                 # MIT
 ```
 
@@ -182,6 +202,18 @@ Read [SCHEMA.md](SCHEMA.md) — it's short. The five files in `spirits/` are
 meant to be copied and modified, not treated as a fixed catalog. Keep a
 spirit small enough to read in 30 seconds; if it needs more than that, it's
 probably two spirits.
+
+### Archetypes as a writing method
+
+A spirit doesn't have to be an invented role like "Executor" — it can be
+built from a historical or mythological archetype (a strategist, a builder,
+a guardian). When you do this, extract the **function**, not the biography:
+what specific decision heuristic does this archetype represent, distilled
+into 3-5 testable rules? A spirit named after a strategist is only useful
+if its `## Heuristics` section actually encodes a strategic decision rule —
+the name is a mnemonic for the user, not instruction content for the model.
+This is a writing pattern, not a built feature — there's no automated
+"archetype extractor" in this repo (yet). If you build one, a PR is welcome.
 
 ## Security note
 
