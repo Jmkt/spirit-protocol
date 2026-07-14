@@ -1,35 +1,46 @@
-# spirit-protocol
+# Spirit.MD
 
-**Portable AI personas in plain Markdown — define a persona once, use it in
-Claude, ChatGPT, Gemini, or any local LLM.**
+**Portable AI personas. Invoke persistent minds.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-238636.svg)](LICENSE)
 [![Format](https://img.shields.io/badge/format-markdown-58a6ff.svg)](SCHEMA.md)
-[![No dependencies](https://img.shields.io/badge/dependencies-none-lightgrey.svg)](SCHEMA.md)
+[![Open Protocol](https://img.shields.io/badge/protocol-open-58a6ff.svg)](#)
+
+> Every AI forgets. Your Spirits don't.  
+> **Collect. Invoke. Evolve.**
 
 ---
 
-## The problem
+## What is Spirit.MD?
 
-Every AI tool you use forgets who you told it to be. Switch from Claude to
-Gemini and you retype the same system prompt. Custom GPTs lock a persona to
-one vendor. A system prompt you wrote three weeks ago has no memory of what
-worked and what didn't.
+The open protocol for **persistent AI identities** — plain Markdown files that
+define a persona, voice, and decision heuristics. A spirit is portable: paste
+it into Claude, ChatGPT, Gemini, Ollama, or any LLM. It persists: your spirits
+grow through a session log stored in git. It's open: no vendor lock-in, no
+paywall, no middleman.
 
-## The idea
+One spirit, any AI. Your minds don't reset.
 
-Put the persona in a file, not in a vendor's UI.
+---
 
-A `.spirit.md` is plain Markdown: a role, a voice, a handful of decision
-heuristics, and a running session log. Paste it into any chat, load it via
-a CLI, or hand it to a local model — it works anywhere text works, because
-that's all it is.
+## How it works
 
+A `.spirit.md` is plain Markdown. Three sections:
+
+1. **Frontmatter** — name, invoke phrases, version (machine-readable)
+2. **Body** — role, voice, heuristics (human + LLM-readable)
+3. **LOG** — session notes that grow over time (your spirit's memory)
+
+Paste the full `.spirit.md` into any chat or system prompt. That's it. No SDK,
+no auth, no vendor account. Works with Claude, ChatGPT, Gemini, Ollama, or
+any LLM that accepts Markdown.
+
+**Example: the Skeptic spirit**
 ```markdown
 ---
 name: skeptic
 tag: review
-invoke: ["skeptic", "review this"]
+invoke: ["skeptic", "review this", "poke holes"]
 version: 1.0
 ---
 
@@ -43,51 +54,71 @@ Short, specific, evidence-based.
 
 ## Heuristics
 - Assume every input is adversarial until proven otherwise.
-- A concrete failing example outweighs a general concern.
+- Concrete failing examples outweigh general concerns.
 - If nothing is wrong, say so plainly.
+
+## LOG
+- 2026-07-14: reviewed payment processor, caught off-by-one in discount calc
 ```
 
-Full format spec, including a security section on what a conforming spirit
-must never contain: **[SCHEMA.md](SCHEMA.md)**.
+**Full specification:** [SCHEMA.md](SCHEMA.md) — includes format rules and a
+security section on what a conforming spirit must never contain.
 
 ---
 
-## Does it actually do anything? (real test, not a claim)
+## Does it work? (Real test)
 
-We ran an actual comparison instead of asserting one: the same code-review
-task, given to two fresh instances of the same model — one plain, one with
-[`spirits/skeptic.spirit.md`](spirits/skeptic.spirit.md) loaded. Full raw
-transcripts, unedited: **[tests/results/test-001-skeptic-vs-baseline.md](tests/results/test-001-skeptic-vs-baseline.md)**.
+We ran the same code-review task twice with the same model:
+- **Baseline:** no spirit
+- **With spirit:** [`spirits/skeptic.spirit.md`](spirits/skeptic.spirit.md) loaded
 
-Honest finding: the spirit didn't make the model find more bugs — both
-runs caught the same critical issue. What changed consistently was **how**
-the answer came out:
+**Finding:** Both found the same critical bug. But the spirit changed three
+things consistently:
 
-| | Baseline | With `skeptic.spirit.md` |
+| | Baseline | With Spirit |
 |---|---|---|
-| Critical bug found | ✅ | ✅ |
-| Concrete repro example | Described in prose | `calculateOrderTotal([{price: 10, quantity: 1}], 0)` throws instead of returning `10` |
-| Output structure | Free-form paragraph | Fixed `[SKEPTIC] → Found: N → Worst case: ...` format every time |
-| Voice | Hedged ("presumably unintended") | Direct, evidence-first |
+| **Concrete example** | Described in prose | `calculateOrderTotal([{price: 10, quantity: 1}], 0)` throws |
+| **Structure** | Free-form text | Fixed format: `[SKEPTIC] → Found: N → Worst case: ...` |
+| **Voice** | Hedged ("presumably") | Direct, evidence-first |
 
-This is n=1 — a single qualitative run, not a benchmark, and the README
-says so on purpose. The reproducible claim is narrower than "makes the
-model smarter": **a spirit makes output structure and voice consistent
-across sessions**, which is what matters when you're chaining sessions
-together or parsing output automatically. Run the test yourself with a
-different fixture; instructions are in that file.
+**What this means:** a spirit doesn't make an LLM smarter — it makes it
+consistent. Across sessions, across invocations, across chains. When you're
+building on top of LLM output (parsing, chaining, automating), consistency
+is what matters.
+
+**Full transcript:** [tests/results/test-001-skeptic-vs-baseline.md](tests/results/test-001-skeptic-vs-baseline.md)
+(n=1, unedited, reproducible).
 
 ---
 
-## How this compares
+## Spirit.MD vs. alternatives
 
-| | spirit.md | Custom GPTs | Character cards (SillyTavern) | Raw system prompt |
+The problem with existing approaches:
+
+| Approach | Lock-in | Portable | Persistent | Open |
 |---|---|---|---|---|
-| Works across vendors | ✅ | ❌ (OpenAI only) | ⚠️ (roleplay-focused) | ✅ but not portable |
-| Plain text, no lock-in | ✅ | ❌ | ⚠️ (often JSON/PNG-embedded) | ✅ |
-| Session log / memory | ✅ (git-backed) | ⚠️ (vendor memory, opaque) | ❌ | ❌ |
-| Aimed at real work vs. roleplay | ✅ | ✅ | ❌ | ✅ |
-| Versioned / diffable | ✅ (it's a file) | ❌ | ❌ | ❌ |
+| **Custom GPTs** | OpenAI only | ❌ | Opaque vendor memory | ❌ |
+| **Character cards** | Roleplay-focused | ⚠️ (JSON/PNG embed) | ❌ | ✅ |
+| **Raw system prompt** | Copy-paste hell | ✅ but manual | ❌ (no memory) | ✅ |
+| **Spirit.MD** | ✅ None | ✅ Plain text | ✅ Git-backed LOG | ✅ MIT |
+
+Spirit.MD is the only approach that gives you:
+- **Portability:** One `.md` file → Claude, ChatGPT, Gemini, Ollama
+- **Persistence:** Session log grows with every use, stored in git
+- **Freedom:** No vendor, no paywall, no middleman
+
+---
+
+---
+
+## Key features
+
+✅ **Portable** — Plain Markdown, works with Claude, ChatGPT, Gemini, Ollama, any LLM  
+✅ **No lock-in** — Open format (MIT), no vendor, no middleman  
+✅ **Persistent** — Session log grows with every use, stored in git  
+✅ **Minimal** — No SDK, no API, no authentication  
+✅ **Composable** — Define as many spirits as you need  
+✅ **Verifiable** — Test fixture and comparison transcript included  
 
 ---
 
@@ -112,17 +143,38 @@ spirit-protocol/
 
 ## Quickstart
 
-No installation. No SDK. No account.
+**No installation. No SDK. No account.**
 
-1. Open any spirit in `spirits/`, e.g. [`executor.spirit.md`](spirits/executor.spirit.md).
-2. Paste its full content into your LLM's system prompt / custom instructions field.
-3. Talk to it. At the end of a session, ask the assistant to append a line
-   to the `## LOG` section summarizing what happened — that's the whole
-   persistence mechanism, and it's just editing a text file.
-4. Commit the updated file to git if you want history.
+1. Pick a spirit: [`executor`](spirits/executor.spirit.md), [`skeptic`](spirits/skeptic.spirit.md),
+   [`architect`](spirits/architect.spirit.md), [`mentor`](spirits/mentor.spirit.md), or
+   [`translator`](spirits/translator.spirit.md).
+2. **Copy the full `.md` file content.**
+3. **Paste it into your LLM's system prompt or custom instructions.**
+4. **Talk to your spirit.** At the end of the session, ask the assistant to
+   add one line to the `## LOG` section — that's your spirit's memory.
+5. **Commit to git** if you want history: `git add my-spirit.md && git commit`
 
-That's it. A CLI (`spirit invoke <name>`) and a public registry are planned
-— see Roadmap — but the file format works today with zero tooling.
+That's it. No API keys, no CLI, no central registry. The file format works
+today with every major LLM.
+
+---
+
+## Why spirits?
+
+**Problem:** Every time you switch AI tools (Claude → ChatGPT → Gemini), you
+start over. The prompt you spent time perfecting doesn't follow you. Your
+instructions reset. No memory.
+
+**Solution:** A spirit is a **portable identity file** for AI. One `.md` file
+encodes who your AI assistant should be — its role, voice, heuristics, and
+accumulated experience. It travels with you across LLMs. It grows through
+git history. It's not locked to one vendor.
+
+**The idea:** Just as you carry your identity across tools (email, phone,
+computers), your AI personas should travel with you too — without lock-in,
+without forgetting, without paying a subscription.
+
+---
 
 ## Writing your own spirit
 
