@@ -141,18 +141,6 @@ trusting one you didn't write.
 
 ---
 
-## Roadmap
-
-This repo is **Phase 0**: the format, example spirits, and one honest test.
-No CLI, no registry, no monetization — those come later, and only if this
-phase shows real interest (stars, forks, issues from people actually using
-it, not vanity metrics).
-
-- [x] Phase 0 — format spec, example spirits, real test, MIT license
-- [ ] Phase 1 — CLI (`npx spirit invoke <name>`), community registry via PRs
-- [ ] Phase 2 — curated spirit packs, sponsorship
-- [ ] Phase 3 — voice/screen-share "coach" mode for a single use case (exploratory, not committed)
-
 ## Contributing
 
 Open an issue with a spirit you'd find useful, or a PR adding one to
