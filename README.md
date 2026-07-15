@@ -177,6 +177,27 @@ spirit-protocol/
 That's it. No API keys, no CLI, no central registry. The file format works
 today with every major LLM.
 
+### Global spirits (per-user layer)
+
+Want a spirit that travels with you across all your projects, not just one?
+Store it in `~/.spirits/` (or `%USERPROFILE%\.spirits\` on Windows):
+
+```bash
+~/.spirits/
+├── atenea.spirit.md       # your personal strategist
+├── executor.spirit.md     # your personal shipper
+└── debugger.spirit.md     # your personal skeptic
+```
+
+Load it the same way: copy-paste into any chat or system prompt. The spirit
+doesn't know or care where it lives — it's just a Markdown file. This is
+pure convention, no tooling required. In a future version, a CLI (`spirit
+invoke ~/.spirits/atenea`) might make this automatic, but today: it's a
+folder + a habit.
+
+**Tip:** If you build a spirit from a historical or mythological figure,
+read [ARCHETYPES.md](ARCHETYPES.md) for the extraction method.
+
 ---
 
 ## Why spirits?
