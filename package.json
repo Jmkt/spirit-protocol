@@ -1,0 +1,31 @@
+{
+  "name": "spirit-md",
+  "version": "0.1.0",
+  "description": "CLI and validator for Spirit.MD portable AI personas",
+  "main": "src/validate.js",
+  "bin": {
+    "spirit": "./bin/spirit"
+  },
+  "scripts": {
+    "test": "node src/validate.js spirits",
+    "validate": "node src/validate.js"
+  },
+  "keywords": [
+    "ai",
+    "persona",
+    "prompt",
+    "spirit",
+    "markdown",
+    "llm"
+  ],
+  "author": "Jmkt",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
