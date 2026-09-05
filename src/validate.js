@@ -5,8 +5,11 @@ const yaml = require('js-yaml');
 const REQUIRED_FIELDS = ['name', 'tag', 'invoke', 'version'];
 const VALID_TAGS = new Set([
   'review', 'delivery', 'design', 'strategy', 'teaching',
-  'communication', 'research', 'debugging', 'analysis'
+  'communication', 'research', 'debugging', 'analysis',
+  'forensics', 'execution', 'strategy'
 ]);
+const VALID_DEPTHS = new Set(['L0', 'L1', 'L2', 'L3', 'L4']);
+const VALID_TOGGLES = new Set(['L0', 'L1', 'L2', 'L3', 'L4', 'FAST', 'FULL', 'EXTEND', 'REVIEW']);
 
 function readFile(filePath) {
   try {
@@ -66,6 +69,10 @@ function checkObfuscation(content) {
   return issues;
 }
 
+function isV2Format(body) {
+  return /## §1/.test(body) || /## §2/.test(body);
+}
+
 function validateSpirit(content, filePath) {
   const errors = [];
   const warnings = [];
@@ -100,8 +107,37 @@ function validateSpirit(content, filePath) {
     errors.push(`Invalid semver: ${frontmatter.version}`);
   }
 
-  if (!body.includes('## Boundaries')) {
-    errors.push('Missing required section: ## Boundaries');
+  if (frontmatter.alias && !Array.isArray(frontmatter.alias)) {
+    errors.push('Field "alias" must be an array of strings');
+  } else if (frontmatter.alias) {
+    for (const a of frontmatter.alias) {
+      if (typeof a !== 'string') {
+        errors.push('Each alias must be a string');
+        break;
+      }
+    }
+  }
+
+  if (frontmatter.depth && !VALID_DEPTHS.has(frontmatter.depth)) {
+    errors.push(`Invalid depth: ${frontmatter.depth}. Must be one of: ${[...VALID_DEPTHS].join(', ')}`);
+  }
+
+  const v2 = isV2Format(body);
+
+  if (v2) {
+    if (!/## §1 · DECLARATIVE IDENTITY/.test(body)) {
+      warnings.push('v2 spirit missing §1 · DECLARATIVE IDENTITY');
+    }
+    if (!/## §6 · GAPS_LOG/.test(body) && !/## §6 /.test(body)) {
+      warnings.push('v2 spirit missing §6 · GAPS_LOG');
+    }
+    if (!/## §7 · USER-SIDE TOGGLES/.test(body) && !/## §7 /.test(body)) {
+      warnings.push('v2 spirit missing §7 · USER-SIDE TOGGLES');
+    }
+  } else {
+    if (!body.includes('## Boundaries')) {
+      errors.push('Missing required section: ## Boundaries');
+    }
   }
 
   const logMatch = body.match(/^## LOG\s*$/m);
@@ -128,7 +164,8 @@ function validateSpirit(content, filePath) {
     valid: errors.length === 0,
     errors,
     warnings,
-    file: path.basename(filePath)
+    file: path.basename(filePath),
+    format: v2 ? 'v2' : 'v0.1'
   };
 }
 
@@ -180,28 +217,35 @@ function validatePath(targetPath) {
 
 function printResults(results) {
   let hasErrors = false;
+  let v2Count = 0;
+  let v01Count = 0;
 
   for (const result of results) {
+    if (result.format === 'v2') v2Count++;
+    else v01Count++;
+
     if (result.errors.length === 0 && result.warnings.length === 0) {
-      console.log(`✓ ${result.file}`);
+      console.log(`✓ ${result.file} [${result.format}]`);
       continue;
     }
 
     if (result.errors.length > 0) {
       hasErrors = true;
-      console.log(`✗ ${result.file}`);
+      console.log(`✗ ${result.file} [${result.format}]`);
       for (const err of result.errors) {
         console.log(`  error: ${err}`);
       }
     }
 
     if (result.warnings.length > 0) {
-      console.log(`! ${result.file}`);
+      console.log(`! ${result.file} [${result.format}]`);
       for (const warn of result.warnings) {
         console.log(`  warning: ${warn}`);
       }
     }
   }
+
+  console.log(`\nFormat: ${v2Count} v2.0, ${v01Count} v0.1`);
 
   if (hasErrors) {
     console.log('\nValidation failed.');
