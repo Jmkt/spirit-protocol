@@ -163,45 +163,6 @@ User: @atenea [CHAIN sherlock] investigate the failure modes
 
 ---
 
-## The LOG section
-
-The LOG is free-text notes appended after a session — what was worked on,
-what worked, what didn't. Its value is context for the next session.
-
-```markdown
-## LOG
-- 2026-07-12: refactored auth middleware, flagged one edge case in token refresh
-- 2026-07-14: reviewed payment retry logic, no issues found
-```
-
-**What the LOG is not:** a leaderboard metric, a trust score, an "experience
-level," or proof that a persona is good. See [Security](#security).
-
----
-
-## The GAPS_LOG section (§6)
-
-The GAPS_LOG is maintained by the spirit itself, not by the user. It tracks:
-
-- Missing knowledge (a topic raised by the user that isn't in §4)
-- Contradictions (new information that conflicts with canon)
-- Extension requests (new sources the spirit wants added to §4)
-
-```markdown
-## §6 · GAPS_LOG
-- [2026-09-04] Missing: reaction to quantum computing in canon
-- [2026-09-04] User mentioned source "The Quants" by Patterson, not in §4
-- [2026-09-04] Contradiction: heuristic #3 conflicts with documented behavior in 1952 lecture
-```
-
-The spirit must:
-- Append to GAPS_LOG during sessions, never delete entries.
-- Flag gaps to the user only when asked (`[REVIEW]` toggle) or when
-  confidence drops below threshold.
-- Never expose raw GAPS_LOG content to external parties without user consent.
-
----
-
 ## Security
 
 A `.spirit.md` file is **prompt content**, not code — but it is still an

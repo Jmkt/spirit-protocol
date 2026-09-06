@@ -45,7 +45,7 @@ function appendLog(name, message) {
   const content = loadSpirit(name);
   const today = new Date().toISOString().split('T')[0];
 
-  const logMatch = content.match(/^(## LOG\s*$)/m);
+  const logMatch = content.match(/^## LOG\s*$/m);
   if (!logMatch) {
     console.error('Error: spirit has no ## LOG section');
     process.exit(1);
@@ -61,6 +61,28 @@ function appendLog(name, message) {
   const filePath = path.join(SPIRITS_DIR, `${name}.spirit.md`);
   fs.writeFileSync(filePath, updated, 'utf8');
   console.log(`Appended to ${name}.spirit.md LOG`);
+}
+
+function appendGap(name, message) {
+  const content = loadSpirit(name);
+  const today = new Date().toISOString().split('T')[0];
+
+  const gapMatch = content.match(/^## §6 · GAPS_LOG\s*$/m);
+  if (!gapMatch) {
+    console.error('Error: spirit has no ## §6 · GAPS_LOG section');
+    process.exit(1);
+  }
+
+  const gapIndex = gapMatch.index + gapMatch[0].length;
+  const before = content.slice(0, gapIndex);
+  const after = content.slice(gapIndex);
+
+  const entry = `\n- [${today}] ${message}`;
+  const updated = before + entry + after;
+
+  const filePath = path.join(SPIRITS_DIR, `${name}.spirit.md`);
+  fs.writeFileSync(filePath, updated, 'utf8');
+  console.log(`Appended to ${name}.spirit.md §6 GAPS_LOG`);
 }
 
 const program = new Command();
@@ -89,6 +111,13 @@ program
   .description('Append a session note to a spirit LOG')
   .action((name, message) => {
     appendLog(name, message);
+  });
+
+program
+  .command('gaps <name> <message>')
+  .description('Append a knowledge gap to a spirit §6 GAPS_LOG')
+  .action((name, message) => {
+    appendGap(name, message);
   });
 
 program
